@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">Crypto</string>
+    <string name="title_activity_encrypt_decrypt">EncryptDecrypt</string>
+</resources>
