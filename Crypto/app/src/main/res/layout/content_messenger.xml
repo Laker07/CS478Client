@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     app:layout_behavior="@string/appbar_scrolling_view_behavior"
-    tools:context="com.example.tony.crypto.EncryptDecrypt"
-    tools:showIn="@layout/activity_encrypt_decrypt">
+    tools:context="com.example.tony.crypto.Chat.Messenger"
+    tools:showIn="@layout/activity_messenger">
 
 </android.support.constraint.ConstraintLayout>
