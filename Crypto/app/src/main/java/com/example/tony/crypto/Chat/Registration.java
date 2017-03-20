@@ -49,12 +49,12 @@ import java.util.HashMap;
 import java.util.Map;
 
 
-//import com.example.tony.crypto.
+
 
 public class Registration extends AppCompatActivity {
 
     //use "http://10.0.2.2:<port> for emulator volley request
-    private static final String ENDPOINTR = "http://10.0.2.2:8081/register2";
+    private static final String ENDPOINTR = "http://10.0.2.2:8081/register";
     private RequestQueue requestQueue;
     TextView jsonI;
     String re = "";
@@ -64,7 +64,6 @@ public class Registration extends AppCompatActivity {
 
     EditText name;
     EditText pwds;
-
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

@@ -61,6 +61,7 @@ public class LoginActivity extends AppCompatActivity {
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String jwt = "jwt";
+    private String uName = "";
 
     EditText name;
     EditText pwds;
@@ -120,7 +121,9 @@ public class LoginActivity extends AppCompatActivity {
                                     Log.d("response : ", respon);
                                     Log.d("msg      : ", msg);
                                     Log.d("jwt      : ", j);
+                                    //set jwt and username to sharedPreferences
                                     editor.putString("jwt", j);
+                                    editor.putString("name", name.getText().toString());
                                     editor.commit();
 
                                     Intent intent = new Intent(getApplicationContext(), Messenger.class);
