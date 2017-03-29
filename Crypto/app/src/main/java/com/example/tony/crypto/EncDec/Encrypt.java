@@ -2,6 +2,7 @@ package com.example.tony.crypto.EncDec;
 
 /**
  * Anthony Martinez
+ * Michael Munoz
  * CECS 478
  * Prof Dr. Aliasgari
  * Class Encrypt: has two methods Enc and Dec
@@ -30,11 +31,6 @@ import javax.crypto.*;
 import javax.crypto.spec.*;
 
 import com.google.gson.*;
-
-
-
-
-
 
 
 public class Encrypt {

@@ -49,8 +49,8 @@ import static android.provider.ContactsContract.CommonDataKinds.Website.URL;
 public class EncryptDecrypt extends AppCompatActivity {
 
     //use "http://10.0.2.2:<port> for emulator volley request
-    private static final String ENDPOINT = "http://10.0.2.2:8081/";
-    private static final String ENDPOINTR = "http://10.0.2.2:8081/register2";
+    private static final String ENDPOINT = "http://10.0.2.2:8080/";
+    private static final String ENDPOINTR = "http://10.0.2.2:8080/register";
     private RequestQueue requestQueue;
     TextView jsonI;
     String re = "";
@@ -69,23 +69,19 @@ public class EncryptDecrypt extends AppCompatActivity {
 
 
 
-
-        //for volley request
-
         jsonI = (TextView) findViewById(R.id.jsonIn);
         final EditText hello = (EditText) findViewById(R.id.helloText);
         final TextView scramble = (TextView) findViewById(R.id.answer);
         Button enc = (Button)findViewById(R.id.encryptbutton);
         Button dec =  (Button)findViewById(R.id.decryptbutton);
 
-
+        //button listener
         enc.setOnClickListener(new View.OnClickListener(){
-
             Keys data;
             Context c = getApplicationContext();
+
             @Override
             public void onClick(View v){
-
                 Encrypt enc = new Encrypt();
                 String message="";//message to return
                 Gson gson = new Gson();

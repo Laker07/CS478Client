@@ -48,19 +48,18 @@ import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.Map;
 
-
-
-
 public class Registration extends AppCompatActivity {
 
     //use "http://10.0.2.2:<port> for emulator volley request
-    private static final String ENDPOINTR = "http://10.0.2.2:8081/register";
+    private static final String ENDPOINTR = "http://10.0.2.2:8080/register";
     private RequestQueue requestQueue;
-    TextView jsonI;
-    String re = "";
+//    TextView jsonI;
+//    String re = "";
     private SharedPreferences sharedPreferences;
     private SharedPreferences.Editor editor;
     private String jwt = "jwt";
+
+    Register reg;
 
     EditText name;
     EditText pwds;
@@ -72,101 +71,86 @@ public class Registration extends AppCompatActivity {
 
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         editor = sharedPreferences.edit();
-        jwt = sharedPreferences.getString("jwt", "not set");
-        Log.d("TOP PREF JWT : ",  jwt);
+//        jwt = sharedPreferences.getString("jwt", "not set");
+//        Log.d("TOP PREF JWT : ",  jwt);
 
         name = (EditText) findViewById(R.id.username);
         pwds = (EditText) findViewById(R.id.password);
         Button submit = (Button)findViewById(R.id.buttonSubmit);
 
-
-
-
-
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
-
         submit.setOnClickListener(new View.OnClickListener(){
-
-
             Context c = getApplicationContext();
+
             @Override
             public void onClick(View v){
-
                 JsonObjectRequest reqPost = new JsonObjectRequest(Request.Method.POST, ENDPOINTR, null,
                         new Response.Listener<JSONObject>() {
 
-
                             @Override
                             public void onResponse(JSONObject response) {
-                                try {
-                                    String respon = response.getString("response");
+                                //create new object to hold json response
+                                Gson gson = new Gson();
+                                reg = gson.fromJson(response.toString(), Register.class);
+                                //log and verify
+                                Log.d("all", response.toString());
+                                Log.d("response : ", reg.getResponse());
+                                Log.d("msg      : ", reg.getMessage());
+                                Log.d("jwt      : ", reg.getJwt());
+                                //place jwt and username in preferences
+                                editor.putString("jwt", reg.getJwt());
+                                editor.putString("name", name.getText().toString());
+                                editor.commit();
+                                //switch screens
+                                Intent intent = new Intent(getApplicationContext(), Messenger.class);
+                                startActivity(intent);
 
-                                    //VolleyLog.v("Response:%n %s", response.toString(4));
-                                    Log.d("all", response.toString());
-
-                                    String msg = response.getString("message");
-                                    String j = response.getString("jwt");
-                                    Log.d("response : ", respon);
-                                    Log.d("msg      : ", msg);
-                                    Log.d("jwt      : ", j);
-                                    editor.putString("jwt", j);
-                                    editor.commit();
-
-                                    Intent intent = new Intent(getApplicationContext(), Messenger.class);
-                                    startActivity(intent);
-
-                                } catch (JSONException e) {
-                                    Log.d("JSONException msg: ", e.getMessage());
-                                    Context context = getApplicationContext();
-                                    CharSequence text = "Invalid user name!";
-                                    int duration = Toast.LENGTH_SHORT;
-
-                                    Toast toast = Toast.makeText(context, text, duration);
-                                    toast.show();
-                                }
+                                //decide where data validation should go
                             }
                         }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
-                        VolleyLog.e("Error: ", error.getMessage());
+                        VolleyLog.e("Volley Error: ", error.getMessage());
                     }
                 }){
+                    //set header content type to application json
                     @Override
                     public Map<String, String> getHeaders() throws AuthFailureError {
                         HashMap<String, String> headers = new HashMap<String, String>();
                         headers.put("Content-Type", "application/json");
                         return headers;
                     }
-
-                    @Override
-                    protected Map<String, String> getParams() throws AuthFailureError {
-                        Map<String, String> parameters = new HashMap<String, String>();
-                        parameters.put("username", name.getText().toString());
-                        parameters.put("password", pwds.getText().toString());
-                        return parameters;
-                    }
+                      //map version
+//                    //set params to send the server (username, password)
+//                    @Override
+//                    protected Map<String, String> getParams() throws AuthFailureError {
+//                        Map<String, String> parameters = new HashMap<String, String>();
+//                        parameters.put("username", name.getText().toString());
+//                        parameters.put("password", pwds.getText().toString());
+//                        return parameters;
+//                    }
+                    //send json with (username, password) using Gson
                     @Override
                     public byte[] getBody() {
                         try {
-                            User requestBodyClass = new User(name.getText().toString(), pwds.getText().toString());//userName.getText().toString(), pwd.getText().toString());
+                            //create User obj and convert to json string with gson
+                            User requestBodyClass = new User(name.getText().toString(), pwds.getText().toString());
                             Gson gson = new Gson();
                             final String requestBody = gson.toJson(requestBodyClass, User.class);
-
-
                             return requestBody == null ? null : requestBody.getBytes("utf-8");
+
                         } catch (UnsupportedEncodingException uee) {
-                            VolleyLog.wtf("Unsupported Encoding while trying to get the bytes of %s using %s",
-                                    null , "utf-8");
+                            VolleyLog.wtf("Unsupported Encoding");
                             return null;
                         }
                     }
                 };
-                //RequestQueue rQueue = Volley.newRequestQueue(Registration.this);
                 requestQueue.add(reqPost);
             }
         } );
     }//end onCreate
+
 
 
 }

@@ -30,7 +30,6 @@ public class User {
     }
 
     public void setPwd(String password) {
-        //hash pwd
         this.password = password;
     }
 }

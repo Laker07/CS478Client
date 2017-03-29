@@ -8,13 +8,16 @@ public class Register {
 
     String response;
     String message;
-    String jwt;
+    String jwtToken;
 
     public Register(String response, String message, String jwt) {
         this.response = response;
         this.message = message;
-        this.jwt = jwt;
+        this.jwtToken = jwt;
     }
 
-    public String getJwt(){return jwt;}
+    public String getJwt(){return jwtToken;}
+    public String getResponse(){return response;}
+    public String getMessage(){return message;}
+
 }
