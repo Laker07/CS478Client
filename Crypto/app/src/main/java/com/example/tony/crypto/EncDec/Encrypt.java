@@ -122,6 +122,9 @@ public class Encrypt {
             //String keyPath = "C:/public_key.pem"; //get pem
             //PemReader r = new PEMParser(new FileReader(keyPath)); //read in
             InputStreamReader rs = new InputStreamReader(manager.open("keys/public_key.pem"));
+
+            //get string from db
+            //PemReader r = new PEMReader(new StringReader(keystring);
             PemReader r = new PEMParser(rs);
 
             byte[] pubkey = r.readPemObject().getContent(); //get bytes
@@ -194,6 +197,10 @@ public class Encrypt {
             InputStreamReader rs = new InputStreamReader(manager.open("keys/private_key.pem"));
             PemReader r = new PEMParser(rs);
             byte[] pubkey = r.readPemObject().getContent(); //get bytes
+
+
+            //maybe get key from db and place directly in
+
             PKCS8EncodedKeySpec pkcs = new PKCS8EncodedKeySpec(pubkey); //encode
             KeyFactory rsaKey = KeyFactory.getInstance("RSA","SC");
             //2- pass in recovered rsa key

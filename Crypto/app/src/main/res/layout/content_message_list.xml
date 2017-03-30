@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<android.support.constraint.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    app:layout_behavior="@string/appbar_scrolling_view_behavior"
+    tools:context="com.example.tony.crypto.Chat.MessageList"
+    tools:showIn="@layout/app_bar_message_list">
+
+
+    <FrameLayout
+        android:layout_width="344dp"
+        android:layout_height="495dp"
+        android:id="@+id/frameLayout"
+        android:layout_marginBottom="0dp"
+        android:layout_marginLeft="0dp">
+
+        <ListView
+            android:id="@+id/listview_friends"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"></ListView>
+
+
+    </FrameLayout>
+</android.support.constraint.ConstraintLayout>

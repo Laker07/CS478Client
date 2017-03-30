@@ -36,8 +36,11 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.example.tony.crypto.DB.DBHandler;
 import com.example.tony.crypto.EncDec.Encrypt;
 import com.example.tony.crypto.EncDec.Keys;
+import com.example.tony.crypto.EncDec.RSAKeyGen;
+import com.example.tony.crypto.POJOS.Friend;
 import com.example.tony.crypto.POJOS.Register;
 import com.example.tony.crypto.POJOS.User;
 import com.example.tony.crypto.R;
@@ -45,8 +48,12 @@ import com.google.gson.Gson;
 
 import org.json.JSONObject;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
+import java.security.KeyPair;
+import java.security.spec.InvalidKeySpecException;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 public class LoginActivity extends AppCompatActivity {
@@ -77,6 +84,26 @@ public class LoginActivity extends AppCompatActivity {
         Button submit = (Button)findViewById(R.id.buttonSubmit);
         Button register = (Button)findViewById(R.id.register);
         requestQueue = Volley.newRequestQueue(getApplicationContext());
+
+        //db
+
+        String barr = "hello im' private";
+        String carr = "hello i'm public";
+
+        final DBHandler db = new DBHandler(this);
+//        Log.d("Insert: ", "Inserting....");
+//        db.addMe(new Friend("tony",carr.getBytes(), barr.getBytes()));
+//        db.addMe(new Friend("arch", null, barr.getBytes()));
+//
+//        Log.d("Reading entries","reading......");
+//        List<Friend> friends = db.getAllFriends();
+//
+//        for(Friend f: friends){
+//            String log = "Name : " + f.getName();
+//            byte[] a = f.getPrivateKey();
+//
+//            Log.d("Name: ", log );
+//        }
 
         submit.setOnClickListener(new View.OnClickListener(){
             Context c = getApplicationContext();
@@ -109,7 +136,7 @@ public class LoginActivity extends AppCompatActivity {
                                     editor.putString("name", name.getText().toString());
                                     editor.commit();
                                     //switch screens
-                                    Intent intent = new Intent(getApplicationContext(), Messenger.class);
+                                    Intent intent = new Intent(getApplicationContext(), MessageList.class);
                                     startActivity(intent);
                                 }
                             }
@@ -150,20 +177,41 @@ public class LoginActivity extends AppCompatActivity {
                                 //create new object to hold json response
                                 Gson gson = new Gson();
                                 reg = gson.fromJson(response.toString(), Register.class);
+
                                 //log and verify
                                 Log.d("all", response.toString());
                                 Log.d("response : ", reg.getResponse());
                                 Log.d("msg      : ", reg.getMessage());
                                 Log.d("jwt      : ", reg.getJwt());
+
                                 //place jwt and username in preferences
                                 editor.putString("jwt", reg.getJwt());
                                 editor.putString("name", name.getText().toString());
                                 editor.commit();
+
+                                //db stuff
+                                //add your name and key
+                                //this needs to mode to another thread
+                                //waits will key is generated and written to db
+                                KeyPair key = RSAKeyGen.generate();
+                                db.addMe(new Friend(name.getText().toString(), RSAKeyGen.getPublic(key), RSAKeyGen.getPrivate(key)));
+
+                                Log.d("Reading entries","reading......");
+                                Friend f = null;
+                                try {
+                                    f = db.getFriend(name.getText().toString());
+                                } catch (InvalidKeySpecException e) {
+                                    e.printStackTrace();
+                                } catch (IOException e) {
+                                    e.printStackTrace();
+                                }
+                                String log = "Name : " + f.getName() + "  public: " + f.getPublicKey() + " priv : " +f.getPrivateKey();
+                                Log.d("Name: ", log );
+
                                 //switch screens
                                 Intent intent = new Intent(getApplicationContext(), Messenger.class);
                                 startActivity(intent);
 
-                                //decide where data validation should go
                             }
                         }, new Response.ErrorListener() {
                     @Override
