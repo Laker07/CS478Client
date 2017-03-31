@@ -119,6 +119,7 @@ public class Messenger extends AppCompatActivity
                         String jwtToken = sharedPreferences.getString("jwt", null);
                         Log.d("JWT AT HEADER: ", jwtToken);
                         HashMap<String, String> headers = new HashMap<String, String>();
+                        headers.put("Content-Type", "application/json");
                         headers.put("Authorization", "Bearer " + jwtToken);
                         return headers;
                     }

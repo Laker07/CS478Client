@@ -40,7 +40,7 @@
             android:id="@+id/register"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
-            android:text="Register fro new account"
+            android:text="Register for new account"
             android:layout_below="@+id/buttonSubmit"
             android:layout_centerHorizontal="true" />
 
