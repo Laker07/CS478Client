@@ -9,8 +9,12 @@ package com.example.tony.crypto.EncDec;
 
  */
 
+import android.app.Application;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.res.AssetManager;
+import android.preference.PreferenceManager;
+import android.util.Log;
 
 import org.spongycastle.jce.provider.BouncyCastleProvider;
 import org.spongycastle.openssl.PEMParser;
@@ -30,6 +34,8 @@ import java.security.spec.*;
 import javax.crypto.*;
 import javax.crypto.spec.*;
 
+import com.example.tony.crypto.DB.DBHandler;
+import com.example.tony.crypto.POJOS.Friend;
 import com.google.gson.*;
 
 
@@ -40,7 +46,14 @@ public class Encrypt {
         Security.addProvider(new BouncyCastleProvider());
     }
 
+
+    private SharedPreferences sharedPreferences;
+
     public String Enc(String test, Context context){
+
+        final DBHandler db = new DBHandler(context);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
         /*create IV
           1-Create random
           2-Create a byte[] of the size of the IV
@@ -121,17 +134,24 @@ public class Encrypt {
 
             //String keyPath = "C:/public_key.pem"; //get pem
             //PemReader r = new PEMParser(new FileReader(keyPath)); //read in
-            InputStreamReader rs = new InputStreamReader(manager.open("keys/public_key.pem"));
+           //-- InputStreamReader rs = new InputStreamReader(manager.open("keys/public_key.pem"));
 
             //get string from db
             //PemReader r = new PEMReader(new StringReader(keystring);
-            PemReader r = new PEMParser(rs);
+            //--PemReader r = new PEMParser(rs);
 
-            byte[] pubkey = r.readPemObject().getContent(); //get bytes
-            X509EncodedKeySpec x509 = new X509EncodedKeySpec(pubkey); //encode
-            KeyFactory keyGenRSA = KeyFactory.getInstance("RSA", "SC"); //sets to rsa key
-            Cipher c = Cipher.getInstance("RSA/NONE/OAEPPadding", "SC");
-            c.init(Cipher.ENCRYPT_MODE, keyGenRSA.generatePublic(x509));
+
+            String name = sharedPreferences.getString("name", null);
+            Log.d("name from pref: ", name);
+            Friend currentUser = db.getFriend(name);
+
+
+
+            //--byte[] pubkey = r.readPemObject().getContent(); //get bytes
+            //--X509EncodedKeySpec x509 = new X509EncodedKeySpec(pubkey); //encode
+            //--KeyFactory keyGenRSA = KeyFactory.getInstance("RSA", "SC"); //sets to rsa key
+            Cipher c = Cipher.getInstance("RSA/ECB/OAEPPadding", "SC");
+            c.init(Cipher.ENCRYPT_MODE, RSAKeyGen.getRSAPublicKeyFromString(currentUser.getPublicKey()));//--keyGenRSA.generatePublic(x509));
 
             //concatenate aes key and hmac key
             outStream = new ByteArrayOutputStream();
@@ -141,6 +161,7 @@ public class Encrypt {
             //encrypt concatenated keys
             byte[] rsaC = c.doFinal(outStream.toByteArray());
             rsaK = Hex.toHexString(rsaC); //get hex string
+            db.close();
 
         } catch (InvalidKeyException e) {
             e.printStackTrace();
@@ -162,6 +183,9 @@ public class Encrypt {
             //e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("DB error: ", e.getMessage());
         }
 
         /*Keys is a POJO, Gson is a json library
@@ -184,6 +208,9 @@ public class Encrypt {
 
         String keyPath = "C:/private_key.pem"; //get pem
 
+        final DBHandler db = new DBHandler(context);
+        sharedPreferences = PreferenceManager.getDefaultSharedPreferences(context);
+
         try {
             /*retrieve json from jObj
              1-Read in private key
@@ -192,20 +219,27 @@ public class Encrypt {
              4-Separate aes and hmac keys
              */
             //1-
-            AssetManager manager = context.getAssets();
-
-            InputStreamReader rs = new InputStreamReader(manager.open("keys/private_key.pem"));
-            PemReader r = new PEMParser(rs);
-            byte[] pubkey = r.readPemObject().getContent(); //get bytes
-
-
-            //maybe get key from db and place directly in
-
-            PKCS8EncodedKeySpec pkcs = new PKCS8EncodedKeySpec(pubkey); //encode
-            KeyFactory rsaKey = KeyFactory.getInstance("RSA","SC");
+//            AssetManager manager = context.getAssets();
+//
+//            InputStreamReader rs = new InputStreamReader(manager.open("keys/private_key.pem"));
+//            PemReader r = new PEMParser(rs);
+//            byte[] pubkey = r.readPemObject().getContent(); //get bytes
+//
+//
+//            //maybe get key from db and place directly in
+//
+//            PKCS8EncodedKeySpec pkcs = new PKCS8EncodedKeySpec(pubkey); //encode
+//            KeyFactory rsaKey = KeyFactory.getInstance("RSA","SC");
             //2- pass in recovered rsa key
-            Cipher c = Cipher.getInstance("RSA/NONE/OAEPPadding", "SC");
-            c.init(Cipher.DECRYPT_MODE,rsaKey.generatePrivate(pkcs));
+
+
+            String name = sharedPreferences.getString("currentConversation", null);
+            Log.d("name from pref: ", name);
+            Friend currentConversation = db.getFriend(name);
+
+
+            Cipher c = Cipher.getInstance("RSA/ECB/OAEPPadding", "SC");
+            c.init(Cipher.DECRYPT_MODE,RSAKeyGen.getRSAPrivateKeyFromString(currentConversation.getPrivateKey()));//rsaKey.generatePrivate(pkcs));
             //3 - pass in to byte array
             byte[] savedKeys = c.doFinal(Hex.decode(data.rsa));
             //4-
@@ -279,6 +313,9 @@ public class Encrypt {
             e.printStackTrace();
         } catch (InvalidAlgorithmParameterException e) {
             e.printStackTrace();
+        } catch (Exception e) {
+            e.printStackTrace();
+            Log.d("DB error: ", e.getMessage());
         }
 
         return message;

@@ -117,6 +117,7 @@ public class LoginActivity extends AppCompatActivity {
                                 editor.putString("jwt", reg.getJwt());
                                 editor.putString("name", name.getText().toString());
                                 editor.commit();
+                                db.close();
                                 //switch screens
                                 Intent intent = new Intent(getApplicationContext(), MessageList.class);
                                 startActivity(intent);
@@ -185,6 +186,7 @@ public class LoginActivity extends AppCompatActivity {
 
                                 //possible unique constraint exception
                                 db.addMe(new Friend(name.getText().toString(), RSAKeyGen.getPublic(key), RSAKeyGen.getPrivate(key)));
+                                db.close();
                                 Intent intent = new Intent(getApplicationContext(), MessageList.class);
                                 startActivity(intent);
                             }

@@ -1,81 +1,26 @@
 <?xml version="1.0" encoding="utf-8"?>
-<android.support.design.widget.CoordinatorLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<android.support.v4.widget.DrawerLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/drawer_layout"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context="com.example.tony.crypto.Chat.Messenger">
+    android:fitsSystemWindows="true"
+    tools:openDrawer="start">
 
-    <android.support.design.widget.AppBarLayout
+    <include
+        layout="@layout/app_bar_message"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:theme="@style/AppTheme.AppBarOverlay">
+        android:layout_height="match_parent" />
 
-        <android.support.v7.widget.Toolbar
-            android:id="@+id/toolbar"
-            android:layout_width="match_parent"
-            android:layout_height="?attr/actionBarSize"
-            android:background="?attr/colorPrimary"
-            app:popupTheme="@style/AppTheme.PopupOverlay" />
+    <android.support.design.widget.NavigationView
+        android:id="@+id/nav_view"
+        android:layout_width="wrap_content"
+        android:layout_height="match_parent"
+        android:layout_gravity="start"
+        android:fitsSystemWindows="true"
+        app:headerLayout="@layout/nav_header_message_list"
+        app:menu="@menu/activity_message_list_drawer" />
 
-    </android.support.design.widget.AppBarLayout>
+</android.support.v4.widget.DrawerLayout>
 
-    <include layout="@layout/content_messenger"
-        android:id="@+id/include2" />
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
-
-        <EditText
-            android:id="@+id/editText"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentStart="true"
-            android:layout_marginStart="68dp"
-            android:ems="10"
-            android:inputType="textPersonName"
-            android:hint="enter message" />
-
-        <Button
-            android:id="@+id/pullMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Pull"
-            android:layout_above="@+id/editText"
-            android:layout_alignParentEnd="true"
-            android:layout_marginBottom="14dp" />
-
-        <Button
-            android:id="@+id/submitMessage"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_alignParentBottom="true"
-            android:layout_alignParentEnd="true"
-            android:text="Submit" />
-
-        <TextView
-            android:id="@+id/inputMessage"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignParentStart="true"
-            android:layout_alignParentTop="true"
-            android:layout_marginStart="12dp"
-            android:layout_marginTop="75dp"
-            android:ems="10"
-            android:text="your:" />
-
-        <TextView
-            android:id="@+id/editText3"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_alignStart="@+id/inputMessage"
-            android:layout_below="@+id/inputMessage"
-            android:layout_marginTop="90dp"
-            android:ems="10"
-            android:text="received:" />
-    </RelativeLayout>
-
-
-</android.support.design.widget.CoordinatorLayout>

@@ -1,18 +1,20 @@
 package com.example.tony.crypto.Chat;
 
 import android.content.Context;
-import android.content.Intent;
 import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
+import android.support.annotation.NonNull;
+import android.support.design.widget.NavigationView;
+import android.support.v4.view.GravityCompat;
+import android.support.v4.widget.DrawerLayout;
+import android.support.v7.app.ActionBarDrawerToggle;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.Toolbar;
 import android.util.Log;
+import android.view.MenuItem;
 import android.view.View;
 import android.widget.Button;
-import android.widget.EditText;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -27,7 +29,7 @@ import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.tony.crypto.EncDec.Encrypt;
 import com.example.tony.crypto.POJOS.Message;
-import com.example.tony.crypto.POJOS.User;
+import com.example.tony.crypto.POJOS.ServerResponse;
 import com.example.tony.crypto.R;
 import com.google.gson.Gson;
 
@@ -36,18 +38,19 @@ import org.json.JSONObject;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
-import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 import java.text.SimpleDateFormat;
 
-public class Messenger extends AppCompatActivity {
+public class Messenger extends AppCompatActivity
+        implements NavigationView.OnNavigationItemSelectedListener{
 
-    private static final String ENDPOINTR = "http://10.0.2.2:8081/sendMessage";
-    private static final String ENDPOINTP = "http://10.0.2.2:8081/getMessages";
+    private static final String ENDPOINTR = "http://10.0.2.2:8080/sendMessage";
+    private static final String ENDPOINTP = "http://10.0.2.2:8080/getMessages";
 
     private RequestQueue requestQueue;
     private SharedPreferences sharedPreferences;
+    ServerResponse res;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -56,10 +59,20 @@ public class Messenger extends AppCompatActivity {
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
+        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+        ActionBarDrawerToggle toggle = new ActionBarDrawerToggle(
+                this, drawer, toolbar, R.string.navigation_drawer_open, R.string.navigation_drawer_close);
+        drawer.setDrawerListener(toggle);
+        toggle.syncState();
+
+        NavigationView navigationView = (NavigationView) findViewById(R.id.nav_view);
+        navigationView.setNavigationItemSelectedListener(this);
+
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Log.d("jwt : ", sharedPreferences.getString("jwt", null));
         Log.d("name : ", sharedPreferences.getString("name", null));
         Log.d("current: ", sharedPreferences.getString("currentConversation", null));
+
         Button submit = (Button)findViewById(R.id.submitMessage);
         Button pull = (Button)findViewById(R.id.pullMessage);
         final TextView myMsg= (TextView)findViewById(R.id.inputMessage);
@@ -67,38 +80,35 @@ public class Messenger extends AppCompatActivity {
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
 
-        submit.setOnClickListener(new View.OnClickListener(){
 
+
+        submit.setOnClickListener(new View.OnClickListener(){
             Context context = getApplicationContext();
             @Override
             public void onClick(View v) {
-                myMsg.setText(msg.getText().toString());
 
 
                 JsonObjectRequest reqPost = new JsonObjectRequest(Request.Method.POST, ENDPOINTR, null,
-                        new Response.Listener<JSONObject>() {
+                    new Response.Listener<JSONObject>() {
 
-                            @Override
-                            public void onResponse(JSONObject response) {
-                                try {
-                                    //verify 200
-                                    String respon = response.getString("response");
-                                    //VolleyLog.v("Response:%n %s", response.toString(4));
-                                    Log.d("all", response.toString());
-                                    String msg = response.getString("message");
-                                    Log.d("response : ", respon);
+                        @Override
+                        public void onResponse(JSONObject response) {
+                            Gson gson = new Gson();
+                            res = gson.fromJson(response.toString(), ServerResponse.class);
 
-                                } catch (JSONException e) {
-                                    Log.d("JSONException msg: ", e.getMessage());
-                                    Context context = getApplicationContext();
-                                    CharSequence text = "Invalid user name!";
-                                    int duration = Toast.LENGTH_SHORT;
+                            //if login error then toast message to screen
+                            if(res.getResponse().equals("Error")) {
+                                Log.d("error res: ", res.getMessage());
 
-                                    Toast toast = Toast.makeText(context, text, duration);
-                                    toast.show();
-                                }
+                            }else {
+                                myMsg.setText(msg.getText().toString());
+                                Log.d("res : ", res.getMessage());
+
                             }
-                        }, new Response.ErrorListener() {
+
+
+                        }
+                    }, new Response.ErrorListener() {
                     @Override
                     public void onErrorResponse(VolleyError error) {
                         VolleyLog.e("Error: ", error.getMessage());
@@ -118,15 +128,12 @@ public class Messenger extends AppCompatActivity {
                     @Override
                            public byte[] getBody() {
                       try {
-                            //Message ---- new Message(
-
-                           //fake the receive
                            SimpleDateFormat format = new SimpleDateFormat("yyyy.MM.dd.HH.mm.ss");
                            Encrypt enc = new Encrypt();
                            String encMsg = enc.Enc(msg.getText().toString(), context);
 
                            Message requestBodyClass = new Message(sharedPreferences.getString("name", null),
-                                    "laker", encMsg, format.format(new Timestamp(System.currentTimeMillis())));
+                                    sharedPreferences.getString("currentConversation",null), encMsg, format.format(new Timestamp(System.currentTimeMillis())));
                             Gson gson = new Gson();
                             final String requestBody = gson.toJson(requestBodyClass, Message.class);
 
@@ -211,4 +218,34 @@ public class Messenger extends AppCompatActivity {
 
     }
 
+//
+//    @SuppressWarnings("StatementWithEmptyBody")
+//    @Override
+//    public boolean onNavigationItemSelected(MenuItem item) {
+//        // Handle navigation view item clicks here.
+//        int id = item.getItemId();
+//
+//        if (id == R.id.nav_camera) {
+//            // Handle the camera action
+//        } else if (id == R.id.nav_gallery) {
+//
+//        } else if (id == R.id.nav_slideshow) {
+//
+//        } else if (id == R.id.nav_manage) {
+//
+//        } else if (id == R.id.nav_share) {
+//
+//        } else if (id == R.id.nav_send) {
+//
+//        }
+//
+//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
+//        drawer.closeDrawer(GravityCompat.START);
+//        return true;
+//    }
+
+    @Override
+    public boolean onNavigationItemSelected(@NonNull MenuItem item) {
+        return false;
+    }
 }
