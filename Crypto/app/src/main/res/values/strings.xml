@@ -18,7 +18,7 @@
         completions."
     </string>
     <string name="title_activity_messenger">Messenger</string>
-    <string name="title_activity_message_list">MessageList</string>
+    <string name="title_activity_message_list">Friend List</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>

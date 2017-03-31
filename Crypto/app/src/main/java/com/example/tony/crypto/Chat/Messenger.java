@@ -59,6 +59,7 @@ public class Messenger extends AppCompatActivity {
         sharedPreferences = PreferenceManager.getDefaultSharedPreferences(this);
         Log.d("jwt : ", sharedPreferences.getString("jwt", null));
         Log.d("name : ", sharedPreferences.getString("name", null));
+        Log.d("current: ", sharedPreferences.getString("currentConversation", null));
         Button submit = (Button)findViewById(R.id.submitMessage);
         Button pull = (Button)findViewById(R.id.pullMessage);
         final TextView myMsg= (TextView)findViewById(R.id.inputMessage);

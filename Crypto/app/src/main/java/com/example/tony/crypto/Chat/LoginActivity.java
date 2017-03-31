@@ -92,18 +92,18 @@ public class LoginActivity extends AppCompatActivity {
 
         final DBHandler db = new DBHandler(this);
 //        Log.d("Insert: ", "Inserting....");
-//        db.addMe(new Friend("tony",carr.getBytes(), barr.getBytes()));
-//        db.addMe(new Friend("arch", null, barr.getBytes()));
-//
-//        Log.d("Reading entries","reading......");
-//        List<Friend> friends = db.getAllFriends();
-//
-//        for(Friend f: friends){
-//            String log = "Name : " + f.getName();
-//            byte[] a = f.getPrivateKey();
-//
-//            Log.d("Name: ", log );
-//        }
+//        db.addMe(new Friend("one"));
+//        db.addMe(new Friend("two"));
+
+        Log.d("Reading entries","reading......");
+        List<Friend> friends = db.getAllFriends();
+
+        for(Friend f: friends){
+            String log = "Name : " + f.getName();
+
+
+            Log.d("Name: ", log );
+        }
 
         submit.setOnClickListener(new View.OnClickListener(){
             Context c = getApplicationContext();
@@ -198,15 +198,21 @@ public class LoginActivity extends AppCompatActivity {
 
                                 Log.d("Reading entries","reading......");
                                 Friend f = null;
+                               // List<Friend> friends = null;
+                                int count =0;
                                 try {
                                     f = db.getFriend(name.getText().toString());
+                                 //   friends = db.getAllFriends();
                                 } catch (InvalidKeySpecException e) {
                                     e.printStackTrace();
                                 } catch (IOException e) {
                                     e.printStackTrace();
                                 }
-                                String log = "Name : " + f.getName() + "  public: " + f.getPublicKey() + " priv : " +f.getPrivateKey();
-                                Log.d("Name: ", log );
+//                                for(Friend fn: friends) {
+//                                    String log = "Name : " + f.getName();
+//                                    Log.d("Name: ", log);
+//                                }
+
 
                                 //switch screens
                                 Intent intent = new Intent(getApplicationContext(), Messenger.class);

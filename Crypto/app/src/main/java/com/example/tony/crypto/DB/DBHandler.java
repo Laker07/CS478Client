@@ -59,6 +59,8 @@ public class DBHandler extends SQLiteOpenHelper{
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
+
+        //db.execSQL("DROP TABLE IF EXIST " + TABLE_KEYS);
         String CREATE_KEYS_TABLE = "CREATE TABLE " + TABLE_KEYS + "("
                 + KEY_NAME + " TEXT PRIMARY KEY,"
                 + KEY_PU_KEY + " TEXT,"
@@ -126,8 +128,8 @@ public class DBHandler extends SQLiteOpenHelper{
     }
 
     // Getting All Contacts
-    public List<Friend> getAllFriends() {
-        List<Friend> friendList = new ArrayList<Friend>();
+    public ArrayList<Friend> getAllFriends() {
+        ArrayList<Friend> friendList = new ArrayList<Friend>();
         // Select All Query
         String selectQuery = "SELECT  * FROM " + TABLE_KEYS;
 
@@ -139,7 +141,7 @@ public class DBHandler extends SQLiteOpenHelper{
             do {
 
 
-                Friend friend = new Friend(cursor.getString(0), cursor.getString(2));
+                Friend friend = new Friend(cursor.getString(0));
 
                 friendList.add(friend);
             } while (cursor.moveToNext());
