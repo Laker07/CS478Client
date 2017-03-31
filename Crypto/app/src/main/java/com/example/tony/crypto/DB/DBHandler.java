@@ -9,43 +9,19 @@ import android.content.Context;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
-
 import com.example.tony.crypto.POJOS.Friend;
-
-import org.spongycastle.jce.provider.BouncyCastleProvider;
-import org.spongycastle.openssl.PEMParser;
-import org.spongycastle.util.io.pem.PemReader;
-
-import java.io.IOException;
-import java.io.StringReader;
-import java.security.KeyFactory;
-import java.security.NoSuchAlgorithmException;
-import java.security.NoSuchProviderException;
-import java.security.Security;
-import java.security.spec.InvalidKeySpecException;
-import java.security.spec.PKCS8EncodedKeySpec;
-import java.security.spec.X509EncodedKeySpec;
 import java.util.ArrayList;
-import java.util.List;
-
-import javax.crypto.Cipher;
 
 public class DBHandler extends SQLiteOpenHelper{
-    //Will use BouncyCastle as the provider
-    static {
-        Security.addProvider(new BouncyCastleProvider());
-    }
 
-
-    // All Static variables
     // Database Version
     private static final int DATABASE_VERSION = 1;
 
     // Database Name
-    private static final String DATABASE_NAME = "friendManager";
+    private static final String DATABASE_NAME = "friendManager1";
 
     // Contacts table name
-    private static final String TABLE_KEYS = "keyHolder";
+    private static final String TABLE_KEYS = "keyHolder1";
 
     // Contacts Table Columns names
     private static final String KEY_NAME = "name";
@@ -56,10 +32,15 @@ public class DBHandler extends SQLiteOpenHelper{
         super(context, DATABASE_NAME, null, DATABASE_VERSION);
     }
 
+    //deletes the table, but not the db
+    public void dropT(){
+        SQLiteDatabase db = this.getWritableDatabase();
+        db.execSQL("DROP TABLE " + TABLE_KEYS);
+    }
+
     // Creating Tables
     @Override
     public void onCreate(SQLiteDatabase db) {
-
         //db.execSQL("DROP TABLE IF EXIST " + TABLE_KEYS);
         String CREATE_KEYS_TABLE = "CREATE TABLE " + TABLE_KEYS + "("
                 + KEY_NAME + " TEXT PRIMARY KEY,"
@@ -67,7 +48,6 @@ public class DBHandler extends SQLiteOpenHelper{
                 + KEY_PR_KEY + " TEXT" + ")";
         db.execSQL(CREATE_KEYS_TABLE);
     }
-
 
     // Upgrading database
     @Override
@@ -78,10 +58,6 @@ public class DBHandler extends SQLiteOpenHelper{
         // Create tables again
         onCreate(db);
     }
-
-    /**
-     * All CRUD(Create, Read, Update, Delete) Operations
-     */
 
     // Adding new friend, only private key
     public void addFriend(Friend friend) {
@@ -103,8 +79,8 @@ public class DBHandler extends SQLiteOpenHelper{
 
         ContentValues values = new ContentValues();
         values.put(KEY_NAME, friend.getName()); // friend Name
-        values.put(KEY_PU_KEY, friend.getPublicKey()); // friend key
-        values.put(KEY_PR_KEY, friend.getPrivateKey()); // friend key
+        values.put(KEY_PU_KEY, friend.getPublicKey()); // public key
+        values.put(KEY_PR_KEY, friend.getPrivateKey()); // private key
 
         // Inserting Row
         db.insert(TABLE_KEYS, null, values);
@@ -112,7 +88,7 @@ public class DBHandler extends SQLiteOpenHelper{
     }
 
     // Getting single friend
-    public Friend getFriend(String name) throws InvalidKeySpecException, IOException {
+    public Friend getFriend(String name){
         SQLiteDatabase db = this.getReadableDatabase();
 
         Cursor cursor = db.query(TABLE_KEYS, new String[] { KEY_NAME,
@@ -120,7 +96,6 @@ public class DBHandler extends SQLiteOpenHelper{
                 new String[] { name }, null, null, null, null);
         if (cursor != null)
             cursor.moveToFirst();
-
 
         Friend friend = new Friend(cursor.getString(0),cursor.getString(1), cursor.getString(2));
         // return contact
@@ -139,14 +114,10 @@ public class DBHandler extends SQLiteOpenHelper{
         // looping through all rows and adding to list
         if (cursor.moveToFirst()) {
             do {
-
-
-                Friend friend = new Friend(cursor.getString(0));
-
+                Friend friend = new Friend(cursor.getString(0),cursor.getString(1), cursor.getString(2));
                 friendList.add(friend);
             } while (cursor.moveToNext());
         }
-
         // return contact list
         return friendList;
     }
@@ -170,7 +141,6 @@ public class DBHandler extends SQLiteOpenHelper{
                 new String[] { String.valueOf(friend.getName()) });
         db.close();
     }
-
 
     // Getting friends count
     public int getFriendCount() {
