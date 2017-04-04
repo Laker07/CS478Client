@@ -9,8 +9,10 @@
     tools:showIn="@layout/activity_messenger">
 
     <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="match_parent">
+        android:layout_width="344dp"
+        android:layout_height="495dp"
+        tools:layout_editor_absoluteY="8dp"
+        tools:layout_editor_absoluteX="8dp">
 
         <EditText
             android:id="@+id/editText"
@@ -52,7 +54,7 @@
             android:text="your:" />
 
         <TextView
-            android:id="@+id/editText3"
+            android:id="@+id/receivedMsg"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_alignStart="@+id/inputMessage"

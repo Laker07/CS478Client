@@ -13,6 +13,9 @@ public class Message {
     private String message;
     private String date;
 
+    //
+    private String sender;
+
     public Message(String username, String receiverName, String message, String date) {
         this.username = username;
         this.receiverName = receiverName;
@@ -20,4 +23,9 @@ public class Message {
         this.date = date;
     }
 
+    public Message(String message,String sender, String date){
+        this.message = message;
+        this.sender = sender;
+        this.date = date;
+    }
 }

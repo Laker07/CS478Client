@@ -28,13 +28,16 @@ import com.android.volley.VolleyLog;
 import com.android.volley.toolbox.JsonObjectRequest;
 import com.android.volley.toolbox.Volley;
 import com.example.tony.crypto.EncDec.Encrypt;
+import com.example.tony.crypto.POJOS.GetMessages;
 import com.example.tony.crypto.POJOS.Message;
 import com.example.tony.crypto.POJOS.ServerResponse;
 import com.example.tony.crypto.R;
 import com.google.gson.Gson;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
+import org.w3c.dom.Text;
 
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
@@ -51,6 +54,7 @@ public class Messenger extends AppCompatActivity
     private RequestQueue requestQueue;
     private SharedPreferences sharedPreferences;
     ServerResponse res;
+    GetMessages getMes;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -77,6 +81,7 @@ public class Messenger extends AppCompatActivity
         Button pull = (Button)findViewById(R.id.pullMessage);
         final TextView myMsg= (TextView)findViewById(R.id.inputMessage);
         final TextView msg = (TextView) findViewById(R.id.editText);
+        final TextView recMsg = (TextView)findViewById(R.id.receivedMsg);
         requestQueue = Volley.newRequestQueue(getApplicationContext());
 
 
@@ -86,8 +91,7 @@ public class Messenger extends AppCompatActivity
             Context context = getApplicationContext();
             @Override
             public void onClick(View v) {
-
-
+                myMsg.setText(msg.getText().toString());
                 JsonObjectRequest reqPost = new JsonObjectRequest(Request.Method.POST, ENDPOINTR, null,
                     new Response.Listener<JSONObject>() {
 
@@ -101,7 +105,7 @@ public class Messenger extends AppCompatActivity
                                 Log.d("error res: ", res.getMessage());
 
                             }else {
-                                myMsg.setText(msg.getText().toString());
+
                                 Log.d("res : ", res.getMessage());
 
                             }
@@ -120,7 +124,8 @@ public class Messenger extends AppCompatActivity
                         Log.d("JWT AT HEADER: ", jwtToken);
                         HashMap<String, String> headers = new HashMap<String, String>();
                         headers.put("Content-Type", "application/json");
-                        headers.put("Authorization", "Bearer " + jwtToken);
+                        //headers.put("Authorization", "Bearer " + jwtToken);
+                        headers.put("token", jwtToken);
                         return headers;
                     }
 
@@ -172,13 +177,40 @@ public class Messenger extends AppCompatActivity
 
                             @Override
                             public void onResponse(JSONObject response) {
+//
                                 try {
+
                                     //verify 200
                                     String respon = response.getString("response");
                                     //VolleyLog.v("Response:%n %s", response.toString(4));
                                     Log.d("all", response.toString());
-                                    String msg = response.getString("message");
-                                    Log.d("response : ", respon);
+                                    Log.d("count", ""+response.getString("messagecount"));
+                                    Log.d("response ", response.getString("response") );
+
+                                    if(response.getString("response").equals("Error")){
+                                        //toast error
+                                    }else if(response.getString("response").matches("Success")){
+                                        String mes="";// = childJSONObject.getString("message");
+                                        String sen="";// = childJSONObject.getString("sender");
+                                        String dat="";// = childJSONObject.getString("timestamp");
+                                        JSONArray jsonMainArr = response.getJSONArray("messages");
+                                        for (int i = 0; i < jsonMainArr.length(); i++) {  // **line 2**
+                                            JSONObject childJSONObject = jsonMainArr.getJSONObject(i);
+                                            mes = childJSONObject.getString("message");
+                                            sen = childJSONObject.getString("sender");
+                                            dat = childJSONObject.getString("timestamp");
+                                        }
+
+                                        System.out.println("SYSTEM OUT ............... " + jsonMainArr.get(0));
+                                        System.out.println("SYSTEM OUT ............... " + mes);
+                                        Encrypt enc = new Encrypt();
+                                        String encMsg = enc.Dec(mes, context);
+                                        System.out.println("Decrypted message " + encMsg);
+
+                                        recMsg.setText(encMsg);
+                                    }
+
+
 
                                 } catch (JSONException e) {
                                     Log.d("JSONException msg: ", e.getMessage());
@@ -201,7 +233,7 @@ public class Messenger extends AppCompatActivity
                         String jwtToken = sharedPreferences.getString("jwt", null);
                         Log.d("JWT AT HEADER: ", jwtToken);
                         HashMap<String, String> headers = new HashMap<String, String>();
-                        headers.put("Authorization", "Bearer " + jwtToken);
+                        headers.put("token", jwtToken);
                         return headers;
                     }
                 };
@@ -219,31 +251,6 @@ public class Messenger extends AppCompatActivity
 
     }
 
-//
-//    @SuppressWarnings("StatementWithEmptyBody")
-//    @Override
-//    public boolean onNavigationItemSelected(MenuItem item) {
-//        // Handle navigation view item clicks here.
-//        int id = item.getItemId();
-//
-//        if (id == R.id.nav_camera) {
-//            // Handle the camera action
-//        } else if (id == R.id.nav_gallery) {
-//
-//        } else if (id == R.id.nav_slideshow) {
-//
-//        } else if (id == R.id.nav_manage) {
-//
-//        } else if (id == R.id.nav_share) {
-//
-//        } else if (id == R.id.nav_send) {
-//
-//        }
-//
-//        DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
-//        drawer.closeDrawer(GravityCompat.START);
-//        return true;
-//    }
 
     @Override
     public boolean onNavigationItemSelected(@NonNull MenuItem item) {
